@@ -1,6 +1,12 @@
 # StyleMate — AI-Powered Fashion Platform
 
-![Style Mate Application Screenshots](WebScreen.png)
+<p align="center">
+  <img src="WebScreen.png" alt="Style Mate Application Screenshots" width="100%">
+</p>
+<p align="center">
+  <img src="AI-output1.png" alt="AI Virtual Try-On Result 1" width="48%">
+  <img src="AI-output2.png" alt="AI Virtual Try-On Result 2" width="48%">
+</p>
 
 > **Virtual Try-On · Outfit Recommendations · Multi-Role Marketplace**
 
