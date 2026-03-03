@@ -1,0 +1,174 @@
+﻿{% extends 'base.html' %}
+{% block title %}My Profile - Style Mate{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-profile">
+            {% if user and user['profile_image'] %}
+            <img src="{{ url_for('static', filename='uploads/' + user['profile_image']) }}" class="sidebar-avatar"
+                alt="Profile">
+            {% else %}
+            <div class="sidebar-avatar-placeholder">{{ session.get('user_name', 'U')[0] }}</div>
+            {% endif %}
+            <div class="sidebar-user-info">
+                <h4>{{ user['name'] if user else 'User' }}</h4>
+                <span>{{ user['gender'].title() if user and user['gender'] else '' }}</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('user.dashboard') }}" class="sidebar-link"><span>🏠</span> Dashboard</a>
+            <a href="{{ url_for('user.profile') }}" class="sidebar-link active"><span>👤</span> My Profile</a>
+            <a href="{{ url_for('user.recommendations') }}" class="sidebar-link"><span>✨</span> AI Stylist</a>
+            <a href="{{ url_for('user.products') }}" class="sidebar-link"><span>🛍️</span> Browse</a>
+            <a href="{{ url_for('user.logout') }}" class="sidebar-link sidebar-logout"><span>🚪</span> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="dashboard-main">
+        <div class="dashboard-header-bar">
+            <h1>My <span class="gradient-text">Fashion Profile</span></h1>
+        </div>
+
+        <div class="profile-grid">
+            <!-- Photo Upload -->
+            <div class="form-card">
+                <h3>Profile Photo</h3>
+                <form method="post" enctype="multipart/form-data" id="profileForm">
+                    <div class="photo-upload-zone" id="photoZone">
+                        {% if user and user['profile_image'] %}
+                        <img src="{{ url_for('static', filename='uploads/' + user['profile_image']) }}"
+                            id="photoPreview" alt="Profile">
+                        {% else %}
+                        <div id="photoPlaceholder">
+                            <div class="upload-icon">📷</div>
+                            <span>Upload Your Photo</span>
+                            <small>AI will analyze for body type suggestions</small>
+                        </div>
+                        <img id="photoPreview" style="display:none" alt="">
+                        {% endif %}
+                        <input type="file" id="profile_image" name="profile_image" accept="image/*" class="file-input"
+                            onchange="previewPhoto(this)">
+                    </div>
+
+                    <div class="form-divider"><span>Body Measurements</span></div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Height (cm)</label>
+                            <input type="number" name="height" class="form-control"
+                                value="{{ user['height'] if user and user['height'] else '' }}" placeholder="e.g., 165">
+                        </div>
+                        <div class="form-group">
+                            <label>Weight (kg)</label>
+                            <input type="number" name="weight" class="form-control"
+                                value="{{ user['weight'] if user and user['weight'] else '' }}" placeholder="e.g., 60">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Chest / Bust (cm)</label>
+                            <input type="number" name="chest" class="form-control"
+                                value="{{ user['chest'] if user and user['chest'] else '' }}" placeholder="e.g., 90">
+                        </div>
+                        <div class="form-group">
+                            <label>Waist (cm)</label>
+                            <input type="number" name="waist" class="form-control"
+                                value="{{ user['waist'] if user and user['waist'] else '' }}" placeholder="e.g., 70">
+                        </div>
+                        <div class="form-group">
+                            <label>Hips (cm)</label>
+                            <input type="number" name="hips" class="form-control"
+                                value="{{ user['hips'] if user and user['hips'] else '' }}" placeholder="e.g., 95">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Body Type</label>
+                            <select name="body_type" class="form-control">
+                                <option value="">Select Body Type</option>
+                                {% for bt in ['hourglass', 'pear', 'apple', 'rectangle', 'inverted_triangle'] %}
+                                <option value="{{ bt }}" {% if user and user['body_type']==bt %}selected{% endif %}>
+                                    {{ bt.replace('_', ' ').title() }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Skin Tone</label>
+                            <select name="skin_tone" class="form-control">
+                                <option value="">Select Skin Tone</option>
+                                {% for st in ['fair', 'light', 'medium', 'olive', 'tan', 'dark'] %}
+                                <option value="{{ st }}" {% if user and user['skin_tone']==st %}selected{% endif %}>
+                                    {{ st.title() }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full">Save Profile</button>
+                </form>
+            </div>
+
+            <!-- Body Type Guide -->
+            <div class="form-card guide-card">
+                <h3>Body Type Guide</h3>
+                <div class="body-type-guide">
+                    <div class="guide-item">
+                        <strong>⧖ Hourglass</strong>
+                        <span>Balanced bust and hips, defined waist</span>
+                    </div>
+                    <div class="guide-item">
+                        <strong>🍐 Pear</strong>
+                        <span>Hips wider than shoulders</span>
+                    </div>
+                    <div class="guide-item">
+                        <strong>🍎 Apple</strong>
+                        <span>Fuller midsection, narrower hips</span>
+                    </div>
+                    <div class="guide-item">
+                        <strong>▬ Rectangle</strong>
+                        <span>Similar bust, waist, and hips</span>
+                    </div>
+                    <div class="guide-item">
+                        <strong>△ Inverted Triangle</strong>
+                        <span>Broader shoulders, narrower hips</span>
+                    </div>
+                </div>
+
+                <div class="form-divider"><span>Skin Tone Reference</span></div>
+                <div class="skin-tone-guide">
+                    {% for tone, color in [('fair', '#FDDBB4'), ('light', '#F5C294'), ('medium', '#D4956A'), ('olive',
+                    '#C68642'), ('tan', '#A0522D'), ('dark', '#6B3526')] %}
+                    <div class="tone-chip">
+                        <span class="tone-dot" style="background:{{ color }}"></span>
+                        <span>{{ tone.title() }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function previewPhoto(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const preview = document.getElementById('photoPreview');
+                const placeholder = document.getElementById('photoPlaceholder');
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                if (placeholder) placeholder.style.display = 'none';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+{% endblock %}

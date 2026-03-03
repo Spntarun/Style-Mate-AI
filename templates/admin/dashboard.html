@@ -1,0 +1,170 @@
+﻿{% extends 'base.html' %}
+{% block title %}Admin Dashboard - Style Mate{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <aside class="dashboard-sidebar admin-sidebar">
+        <div class="sidebar-profile">
+            <div class="sidebar-avatar-placeholder admin-avatar">A</div>
+            <div class="sidebar-user-info">
+                <h4>Administrator</h4><span>Full Access</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('admin.dashboard') }}" class="sidebar-link active"><span>🏠</span> Dashboard</a>
+            <a href="{{ url_for('admin.users') }}" class="sidebar-link"><span>👥</span> Users</a>
+            <a href="{{ url_for('admin.vendors') }}" class="sidebar-link">
+                <span>🏪</span> Vendors
+                {% if pending_vendors > 0 %}<span class="badge-count">{{ pending_vendors }}</span>{% endif %}
+            </a>
+            <a href="{{ url_for('admin.products') }}" class="sidebar-link"><span>👔</span> Products</a>
+            <a href="{{ url_for('admin.orders') }}" class="sidebar-link"><span>📦</span> Orders</a>
+            <a href="{{ url_for('admin.sales') }}" class="sidebar-link"><span>📊</span> Sales</a>
+            <a href="{{ url_for('admin.logout') }}" class="sidebar-link sidebar-logout"><span>🚪</span> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="dashboard-main">
+        <div class="dashboard-header-bar">
+            <h1>Platform <span class="gradient-text">Overview</span></h1>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid stats-grid-wide">
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-data">
+                    <span class="stat-value">{{ total_users }}</span>
+                    <span class="stat-label">Total Users</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🏪</div>
+                <div class="stat-data">
+                    <span class="stat-value">{{ total_vendors }}</span>
+                    <span class="stat-label">Active Vendors</span>
+                </div>
+            </div>
+            <div class="stat-card {% if pending_vendors > 0 %}stat-alert{% endif %}">
+                <div class="stat-icon">⏳</div>
+                <div class="stat-data">
+                    <span class="stat-value">{{ pending_vendors }}</span>
+                    <span class="stat-label">Pending Approvals</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">👔</div>
+                <div class="stat-data">
+                    <span class="stat-value">{{ total_products }}</span>
+                    <span class="stat-label">Active Products</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📦</div>
+                <div class="stat-data">
+                    <span class="stat-value">{{ total_orders }}</span>
+                    <span class="stat-label">Total Orders</span>
+                </div>
+            </div>
+            <div class="stat-card stat-revenue">
+                <div class="stat-icon">💰</div>
+                <div class="stat-data">
+                    <span class="stat-value">₹{{ "%.0f"|format(total_revenue) }}</span>
+                    <span class="stat-label">Platform Revenue</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Vendors -->
+        {% if pending_vendor_list %}
+        <div class="dashboard-section">
+            <div class="section-header-row">
+                <h2>⏳ Pending Vendor Approvals</h2>
+                <a href="{{ url_for('admin.vendors') }}" class="btn btn-outline btn-sm">View All Vendors</a>
+            </div>
+            <div class="orders-table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Brand</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Registered</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for v in pending_vendor_list %}
+                        <tr>
+                            <td>{{ v['name'] }}</td>
+                            <td><strong>{{ v['brand_name'] }}</strong></td>
+                            <td>{{ v['email'] }}</td>
+                            <td>{{ v['phone'] or '-' }}</td>
+                            <td>{{ v['created_at'][:10] }}</td>
+                            <td>
+                                <div class="action-btns">
+                                    <form method="post"
+                                        action="{{ url_for('admin.approve_vendor', vendor_id=v['id']) }}"
+                                        style="display:inline">
+                                        <button type="submit" class="btn btn-success btn-xs">Approve</button>
+                                    </form>
+                                    <form method="post" action="{{ url_for('admin.reject_vendor', vendor_id=v['id']) }}"
+                                        style="display:inline">
+                                        <button type="submit" class="btn btn-danger btn-xs">Reject</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Recent Orders -->
+        <div class="dashboard-section">
+            <div class="section-header-row">
+                <h2>Recent Orders</h2>
+                <a href="{{ url_for('admin.orders') }}" class="btn btn-outline btn-sm">View All</a>
+            </div>
+            {% if recent_orders %}
+            <div class="orders-table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>User</th>
+                            <th>Product</th>
+                            <th>Vendor</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for o in recent_orders %}
+                        <tr>
+                            <td>#{{ o['id'] }}</td>
+                            <td>{{ o['user_name'] }}</td>
+                            <td>{{ o['product_name'] }}</td>
+                            <td>{{ o['brand_name'] }}</td>
+                            <td>₹{{ "%.0f"|format(o['total_price']) }}</td>
+                            <td><span class="badge badge-{{ o['status'] }}">{{ o['status'].title() }}</span></td>
+                            <td>{{ o['created_at'][:10] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">📋</div>
+                <h3>No orders yet</h3>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+</div>
+{% endblock %}

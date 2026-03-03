@@ -1,0 +1,230 @@
+﻿{% extends 'base.html' %}
+{% block title %}Dashboard - Style Mate{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-profile">
+            {% if user and user['profile_image'] %}
+            <img src="{{ url_for('static', filename='uploads/' + user['profile_image']) }}" class="sidebar-avatar"
+                alt="Profile">
+            {% else %}
+            <div class="sidebar-avatar-placeholder">{{ session.get('user_name', 'U')[0] }}</div>
+            {% endif %}
+            <div class="sidebar-user-info">
+                <h4>{{ user['name'] if user else 'User' }}</h4>
+                <span>{{ user['email'] if user else '' }}</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('user.dashboard') }}" class="sidebar-link active">
+                <span>🏠</span> Dashboard
+            </a>
+            <a href="{{ url_for('user.profile') }}" class="sidebar-link">
+                <span>👤</span> My Profile
+            </a>
+            <a href="{{ url_for('user.recommendations') }}" class="sidebar-link">
+                <span>✨</span> AI Stylist
+            </a>
+            <a href="{{ url_for('user.products') }}" class="sidebar-link">
+                <span>🛍️</span> Browse Products
+            </a>
+            <a href="{{ url_for('user.logout') }}" class="sidebar-link sidebar-logout">
+                <span>🚪</span> Logout
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+        <div class="dashboard-header-bar">
+            <h1>Welcome back, <span class="gradient-text">{{ user['name'].split()[0] if user else 'Friend' }}</span>! 👋
+            </h1>
+            <a href="{{ url_for('user.recommendations') }}" class="btn btn-primary">
+                <span>✨</span> Get AI Outfit Recommendations
+            </a>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📦</div>
+                <div class="stat-data">
+                    <span class="stat-value">{{ orders|length }}</span>
+                    <span class="stat-label">Total Orders</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🪄</div>
+                <div class="stat-data">
+                    <span class="stat-value">{{ generated|length }}</span>
+                    <span class="stat-label">AI Previews</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📐</div>
+                <div class="stat-data">
+                    <span class="stat-value">{{ user['body_type'].capitalize() if user and user['body_type'] else 'N/A'
+                        }}</span>
+                    <span class="stat-label">Body Type</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🎨</div>
+                <div class="stat-data">
+                    <span class="stat-value">{{ user['skin_tone'].capitalize() if user and user['skin_tone'] else 'N/A'
+                        }}</span>
+                    <span class="stat-label">Skin Tone</span>
+                </div>
+            </div>
+        </div>
+
+        {% if not (user and user['body_type']) %}
+        <!-- Profile Completion Banner -->
+        <div class="info-banner">
+            <div class="info-banner-icon">💡</div>
+            <div class="info-banner-text">
+                <strong>Complete your profile</strong> to unlock personalized recommendations and AI outfit previews.
+            </div>
+            <a href="{{ url_for('user.profile') }}" class="btn btn-primary btn-sm">Complete Profile</a>
+        </div>
+        {% endif %}
+
+        <!-- AI Generated Outfits History -->
+        {% if generated %}
+        <div class="dashboard-section">
+            <div class="section-header-row">
+                <h2>🪄 My AI Virtual Try-On History</h2>
+                <a href="{{ url_for('user.products') }}" class="btn btn-outline btn-sm">+ Generate More</a>
+            </div>
+            <div class="generated-grid">
+                {% for g in generated %}
+                <div class="generated-card">
+                    <div class="generated-img-wrap"
+                        onclick="openDashModal('{{ url_for('static', filename='generated/' + g['generated_image']) }}', '{{ g['product_name'] | replace("'","") }}'
+                        )">
+                        <img src="{{ url_for('static', filename='generated/' + g['generated_image']) }}"
+                            alt="AI Try-On: {{ g['product_name'] }}" loading="lazy">
+                        <div class="generated-zoom-overlay">
+                            <span class="zoom-icon">🔍</span>
+                        </div>
+                    </div>
+                    <div class="generated-card-footer">
+                        <span class="generated-product-name">{{ g['product_name'] }}</span>
+                        <span class="generated-date">{{ g['created_at'][:10] if g['created_at'] else '' }}</span>
+                        <div class="generated-card-actions">
+                            <button class="btn-icon-sm" title="Fullscreen Preview"
+                                onclick="openDashModal('{{ url_for('static', filename='generated/' + g['generated_image']) }}', '{{ g['product_name'] | replace("'","") }}'
+                                )">🔍</button>
+                            <a class="btn-icon-sm" title="Download"
+                                href="{{ url_for('static', filename='generated/' + g['generated_image']) }}"
+                                download="{{ g['product_name'] | replace(' ','_') }}_tryon.png">⬇️</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Dashboard Preview Modal -->
+        <div id="dashModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92);
+             z-index:9999; align-items:center; justify-content:center; flex-direction:column;">
+            <div style="position:relative; max-width:90vw; max-height:90vh; text-align:center;">
+                <p id="dashModalLabel" style="color:#c084fc; font-weight:600; font-size:16px; margin-bottom:12px;"></p>
+                <img id="dashModalImg" src="" alt="AI Virtual Try-On" style="max-width:88vw; max-height:78vh; border-radius:16px;
+                            box-shadow:0 0 60px rgba(168,85,247,0.3); object-fit:contain;">
+                <div style="margin-top:16px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+                    <button id="dashModalDownloadBtn" onclick="dashDownload()"
+                        style="background:linear-gradient(135deg,#a855f7,#ec4899); color:#fff; border:none;
+                               padding:10px 24px; border-radius:30px; cursor:pointer; font-size:15px; font-weight:600;">
+                        ⬇️ Download This Look
+                    </button>
+                    <button onclick="closeDashModal()" style="background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.3);
+                               padding:10px 24px; border-radius:30px; cursor:pointer; font-size:15px;">
+                        ✕ Close
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            let _dashCurrentSrc = '', _dashCurrentName = '';
+            function openDashModal(src, name) {
+                _dashCurrentSrc = src;
+                _dashCurrentName = name;
+                document.getElementById('dashModalImg').src = src;
+                document.getElementById('dashModalLabel').textContent = name;
+                document.getElementById('dashModal').style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+            function closeDashModal() {
+                document.getElementById('dashModal').style.display = 'none';
+                document.body.style.overflow = '';
+            }
+            function dashDownload() {
+                const a = document.createElement('a');
+                a.href = _dashCurrentSrc;
+                a.download = (_dashCurrentName.replace(/\s+/g, '_') || 'tryon') + '.png';
+                document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            }
+            document.getElementById('dashModal').addEventListener('click', function (e) {
+                if (e.target === this) closeDashModal();
+            });
+            document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDashModal(); });
+        </script>
+
+        <!-- Recent Orders -->
+        <div class="dashboard-section">
+            <div class="section-header-row">
+                <h2>My Orders</h2>
+            </div>
+            {% if orders %}
+            <div class="orders-table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Product</th>
+                            <th>Brand</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>#{{ order['id'] }}</td>
+                            <td>
+                                <div class="order-product">
+                                    {% if order['product_image'] %}
+                                    <img src="{{ url_for('static', filename='uploads/' + order['product_image']) }}"
+                                        class="order-thumb" alt="">
+                                    {% endif %}
+                                    <span>{{ order['product_name'] }}</span>
+                                </div>
+                            </td>
+                            <td>{{ order['brand_name'] }}</td>
+                            <td>₹{{ "%.2f"|format(order['total_price']) }}</td>
+                            <td><span class="badge badge-{{ order['status'] }}">{{ order['status'].title() }}</span>
+                            </td>
+                            <td>{{ order['created_at'][:10] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">🛍️</div>
+                <h3>No orders yet</h3>
+                <p>Start browsing our collection and place your first order.</p>
+                <a href="{{ url_for('user.products') }}" class="btn btn-primary">Browse Products</a>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+</div>
+{% endblock %}

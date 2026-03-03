@@ -1,0 +1,180 @@
+﻿{% extends 'base.html' %}
+{% block title %}Add Product - Style Mate{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <aside class="dashboard-sidebar vendor-sidebar">
+        <div class="sidebar-profile">
+            <div class="sidebar-avatar-placeholder vendor-avatar">{{ session.get('vendor_name', 'V')[0] }}</div>
+            <div class="sidebar-user-info">
+                <h4>Vendor Portal</h4><span>Add Product</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('vendor.dashboard') }}" class="sidebar-link"><span>🏠</span> Dashboard</a>
+            <a href="{{ url_for('vendor.products') }}" class="sidebar-link"><span>👔</span> Products</a>
+            <a href="{{ url_for('vendor.add_product') }}" class="sidebar-link active"><span>➕</span> Add Product</a>
+            <a href="{{ url_for('vendor.orders') }}" class="sidebar-link"><span>📦</span> Orders</a>
+            <a href="{{ url_for('vendor.sales') }}" class="sidebar-link"><span>📊</span> Sales</a>
+            <a href="{{ url_for('vendor.logout') }}" class="sidebar-link sidebar-logout"><span>🚪</span> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="dashboard-main">
+        <div class="dashboard-header-bar">
+            <h1>Add New <span class="gradient-text">Product</span></h1>
+        </div>
+
+        <div class="form-card-full">
+            <form method="post" enctype="multipart/form-data" class="product-form">
+                <div class="form-section">
+                    <h3>Basic Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Product Name *</label>
+                            <input type="text" name="name" required class="form-control"
+                                placeholder="e.g., Floral Wrap Dress">
+                        </div>
+                        <div class="form-group">
+                            <label>Category *</label>
+                            <select name="category" required class="form-control">
+                                <option value="">Select Category</option>
+                                {% for cat in ['saree', 'kurti', 'lehenga', 'shirt', 'trousers', 'dress', 'jeans',
+                                't-shirt', 'ethnic', 'western', 'sportswear', 'blazer', 'skirt', 'jumpsuit', 'kurta',
+                                'sherwani'] %}
+                                <option value="{{ cat }}">{{ cat.title() }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea name="description" class="form-control" rows="3"
+                            placeholder="Describe the product..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Pricing & Stock</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Price (₹) *</label>
+                            <input type="number" name="price" required class="form-control" placeholder="e.g., 1499"
+                                step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label>Stock Quantity</label>
+                            <input type="number" name="stock" class="form-control" value="10" min="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Product Attributes</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Gender</label>
+                            <select name="gender" class="form-control">
+                                <option value="female">Female</option>
+                                <option value="male">Male</option>
+                                <option value="unisex">Unisex</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Available Sizes</label>
+                            <select name="size" class="form-control">
+                                <option value="">All Sizes</option>
+                                {% for s in ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Free Size'] %}
+                                <option value="{{ s }}">{{ s }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Color</label>
+                            <input type="text" name="color" class="form-control" placeholder="e.g., Navy Blue">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Occasion</label>
+                            <select name="occasion" class="form-control">
+                                <option value="">All Occasions</option>
+                                {% for occ in ['casual', 'formal', 'party', 'wedding', 'sports', 'office', 'beach'] %}
+                                <option value="{{ occ }}">{{ occ.title() }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Climate</label>
+                            <select name="climate" class="form-control">
+                                <option value="">All Climates</option>
+                                {% for cli in ['hot', 'cold', 'moderate', 'rainy', 'humid'] %}
+                                <option value="{{ cli }}">{{ cli.title() }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Best for Body Type</label>
+                            <select name="body_type" class="form-control">
+                                <option value="">All Body Types</option>
+                                {% for bt in ['hourglass', 'pear', 'apple', 'rectangle', 'inverted_triangle'] %}
+                                <option value="{{ bt }}">{{ bt.replace('_', ' ').title() }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Best for Skin Tone</label>
+                            <select name="skin_tone" class="form-control">
+                                <option value="">All Skin Tones</option>
+                                {% for st in ['fair', 'light', 'medium', 'olive', 'tan', 'dark'] %}
+                                <option value="{{ st }}">{{ st.title() }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Product Image</h3>
+                    <div class="photo-upload-zone" id="productPhotoZone">
+                        <div id="productPhotoPlaceholder">
+                            <div class="upload-icon">📷</div>
+                            <span>Upload Product Image</span>
+                            <small>PNG, JPG, WEBP up to 16MB</small>
+                        </div>
+                        <img id="productPhotoPreview" style="display:none; max-height: 200px; border-radius: 8px;"
+                            alt="">
+                        <input type="file" name="image" accept="image/*" class="file-input"
+                            onchange="previewProductPhoto(this)">
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-secondary btn-lg">Upload Product</button>
+                    <a href="{{ url_for('vendor.products') }}" class="btn btn-outline btn-lg">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function previewProductPhoto(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const preview = document.getElementById('productPhotoPreview');
+                const placeholder = document.getElementById('productPhotoPlaceholder');
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                placeholder.style.display = 'none';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+{% endblock %}

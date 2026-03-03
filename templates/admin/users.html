@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}Manage Users - Admin{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <aside class="dashboard-sidebar admin-sidebar">
+        <div class="sidebar-profile">
+            <div class="sidebar-avatar-placeholder admin-avatar">A</div>
+            <div class="sidebar-user-info">
+                <h4>Administrator</h4><span>User Management</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('admin.dashboard') }}" class="sidebar-link"><span>🏠</span> Dashboard</a>
+            <a href="{{ url_for('admin.users') }}" class="sidebar-link active"><span>👥</span> Users</a>
+            <a href="{{ url_for('admin.vendors') }}" class="sidebar-link"><span>🏪</span> Vendors</a>
+            <a href="{{ url_for('admin.products') }}" class="sidebar-link"><span>👔</span> Products</a>
+            <a href="{{ url_for('admin.orders') }}" class="sidebar-link"><span>📦</span> Orders</a>
+            <a href="{{ url_for('admin.sales') }}" class="sidebar-link"><span>📊</span> Sales</a>
+            <a href="{{ url_for('admin.logout') }}" class="sidebar-link sidebar-logout"><span>🚪</span> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="dashboard-main">
+        <div class="dashboard-header-bar">
+            <h1>Manage <span class="gradient-text">Users</span></h1>
+        </div>
+
+        {% if users %}
+        <div class="orders-table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Gender</th>
+                        <th>Body Type</th>
+                        <th>Skin Tone</th>
+                        <th>Registered</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr>
+                        <td>#{{ u['id'] }}</td>
+                        <td>
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                {% if u['profile_image'] %}
+                                <img src="{{ url_for('static', filename='uploads/' + u['profile_image']) }}"
+                                    style="width:32px;height:32px;border-radius:50%;object-fit:cover;" alt="">
+                                {% else %}
+                                <div
+                                    style="width:32px;height:32px;border-radius:50%;background:var(--gradient-main);display:flex;align-items:center;justify-content:center;color:white;font-size:0.8rem;font-weight:700;">
+                                    {{ u['name'][0] }}</div>
+                                {% endif %}
+                                {{ u['name'] }}
+                            </div>
+                        </td>
+                        <td>{{ u['email'] }}</td>
+                        <td>{{ u['gender'].title() if u['gender'] else '-' }}</td>
+                        <td>{{ u['body_type'].replace('_',' ').title() if u['body_type'] else '-' }}</td>
+                        <td>{{ u['skin_tone'].title() if u['skin_tone'] else '-' }}</td>
+                        <td>{{ u['created_at'][:10] }}</td>
+                        <td>
+                            <form method="post" action="{{ url_for('admin.delete_user', user_id=u['id']) }}"
+                                onsubmit="return confirm('Delete user {{ u['name'] }}?')">
+                                <button type="submit" class="btn btn-danger btn-xs">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">👥</div>
+            <h3>No users yet</h3>
+        </div>
+        {% endif %}
+    </main>
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+# ── Python ────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# ── Virtual environments ───────────────────────
+venv/
+.venv/
+env/
+ENV/
+
+# ── Database (auto-generated) ─────────────────
+fashion_threads.db
+
+# ── User-uploaded and generated images ────────
+static/uploads/
+static/generated/
+
+# ── FASHN VTON model weights (~2 GB) ──────────
+## Comment this out ONLY if you want to commit weights (not recommended)
+fashn-weights/
+
+# ── FASHN VTON source (cloned by setup script) ─
+## Comment out if you want to include the submodule in the repo
+fashn-vton-1.5/
+
+# ── Environment variables ─────────────────────
+.env
+
+# ── OS files ──────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── IDE / editor ──────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── Logs ──────────────────────────────────────
+*.log

@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% block title %}Sales Analytics - Vendor Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <aside class="dashboard-sidebar vendor-sidebar">
+        <div class="sidebar-profile">
+            <div class="sidebar-avatar-placeholder vendor-avatar">{{ session.get('vendor_name', 'V')[0] }}</div>
+            <div class="sidebar-user-info">
+                <h4>Vendor Portal</h4><span>Sales</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('vendor.dashboard') }}" class="sidebar-link"><span>🏠</span> Dashboard</a>
+            <a href="{{ url_for('vendor.products') }}" class="sidebar-link"><span>👔</span> Products</a>
+            <a href="{{ url_for('vendor.add_product') }}" class="sidebar-link"><span>➕</span> Add Product</a>
+            <a href="{{ url_for('vendor.orders') }}" class="sidebar-link"><span>📦</span> Orders</a>
+            <a href="{{ url_for('vendor.sales') }}" class="sidebar-link active"><span>📊</span> Sales</a>
+            <a href="{{ url_for('vendor.logout') }}" class="sidebar-link sidebar-logout"><span>🚪</span> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="dashboard-main">
+        <div class="dashboard-header-bar">
+            <h1><span class="gradient-text">Sales Analytics</span></h1>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-data">
+                    <span class="stat-value">₹{{ "%.0f"|format(total_revenue) }}</span>
+                    <span class="stat-label">Total Revenue</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Sales -->
+        <div class="dashboard-section">
+            <h2>Monthly Performance</h2>
+            {% if monthly_sales %}
+            <div class="orders-table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            <th>Orders</th>
+                            <th>Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for m in monthly_sales %}
+                        <tr>
+                            <td>{{ m['month'] }}</td>
+                            <td>{{ m['orders'] }}</td>
+                            <td>₹{{ "%.0f"|format(m['revenue']) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">📊</div>
+                <h3>No sales data yet</h3>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Top Products -->
+        <div class="dashboard-section">
+            <h2>Top Selling Products</h2>
+            {% if top_products %}
+            <div class="orders-table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Category</th>
+                            <th>Sales</th>
+                            <th>Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in top_products %}
+                        <tr>
+                            <td>{{ p['name'] }}</td>
+                            <td>{{ p['category'].title() if p['category'] else '-' }}</td>
+                            <td>{{ p['sales_count'] }}</td>
+                            <td>₹{{ "%.0f"|format(p['revenue']) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">🏆</div>
+                <h3>No sales data yet</h3>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+</div>
+{% endblock %}

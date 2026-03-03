@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block title %}Manage Vendors - Admin{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <aside class="dashboard-sidebar admin-sidebar">
+        <div class="sidebar-profile">
+            <div class="sidebar-avatar-placeholder admin-avatar">A</div>
+            <div class="sidebar-user-info">
+                <h4>Administrator</h4><span>Vendor Management</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('admin.dashboard') }}" class="sidebar-link"><span>🏠</span> Dashboard</a>
+            <a href="{{ url_for('admin.users') }}" class="sidebar-link"><span>👥</span> Users</a>
+            <a href="{{ url_for('admin.vendors') }}" class="sidebar-link active"><span>🏪</span> Vendors</a>
+            <a href="{{ url_for('admin.products') }}" class="sidebar-link"><span>👔</span> Products</a>
+            <a href="{{ url_for('admin.orders') }}" class="sidebar-link"><span>📦</span> Orders</a>
+            <a href="{{ url_for('admin.sales') }}" class="sidebar-link"><span>📊</span> Sales</a>
+            <a href="{{ url_for('admin.logout') }}" class="sidebar-link sidebar-logout"><span>🚪</span> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="dashboard-main">
+        <div class="dashboard-header-bar">
+            <h1>Manage <span class="gradient-text">Vendors</span></h1>
+        </div>
+
+        {% if vendors %}
+        <div class="orders-table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Brand</th>
+                        <th>Contact</th>
+                        <th>Phone</th>
+                        <th>Status</th>
+                        <th>Registered</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in vendors %}
+                    <tr>
+                        <td>#{{ v['id'] }}</td>
+                        <td>
+                            <strong>{{ v['brand_name'] }}</strong>
+                            <br><small>{{ v['name'] }}</small>
+                        </td>
+                        <td>{{ v['email'] }}</td>
+                        <td>{{ v['phone'] or '-' }}</td>
+                        <td><span class="badge badge-{{ v['status'] }}">{{ v['status'].title() }}</span></td>
+                        <td>{{ v['created_at'][:10] }}</td>
+                        <td>
+                            <div class="action-btns">
+                                {% if v['status'] == 'pending' %}
+                                <form method="post" action="{{ url_for('admin.approve_vendor', vendor_id=v['id']) }}"
+                                    style="display:inline">
+                                    <button type="submit" class="btn btn-success btn-xs">Approve</button>
+                                </form>
+                                <form method="post" action="{{ url_for('admin.reject_vendor', vendor_id=v['id']) }}"
+                                    style="display:inline">
+                                    <button type="submit" class="btn btn-warning btn-xs">Reject</button>
+                                </form>
+                                {% elif v['status'] == 'approved' %}
+                                <form method="post" action="{{ url_for('admin.reject_vendor', vendor_id=v['id']) }}"
+                                    style="display:inline">
+                                    <button type="submit" class="btn btn-warning btn-xs">Suspend</button>
+                                </form>
+                                {% elif v['status'] == 'rejected' %}
+                                <form method="post" action="{{ url_for('admin.approve_vendor', vendor_id=v['id']) }}"
+                                    style="display:inline">
+                                    <button type="submit" class="btn btn-success btn-xs">Re-Approve</button>
+                                </form>
+                                {% endif %}
+                                <form method="post" action="{{ url_for('admin.delete_vendor', vendor_id=v['id']) }}"
+                                    onsubmit="return confirm('Delete vendor?')" style="display:inline">
+                                    <button type="submit" class="btn btn-danger btn-xs">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">🏪</div>
+            <h3>No vendors yet</h3>
+        </div>
+        {% endif %}
+    </main>
+</div>
+{% endblock %}

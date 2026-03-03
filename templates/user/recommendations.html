@@ -1,0 +1,172 @@
+﻿{% extends 'base.html' %}
+{% block title %}AI Stylist - Style Mate{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-profile">
+            {% if user and user['profile_image'] %}
+            <img src="{{ url_for('static', filename='uploads/' + user['profile_image']) }}" class="sidebar-avatar"
+                alt="Profile">
+            {% else %}
+            <div class="sidebar-avatar-placeholder">{{ session.get('user_name', 'U')[0] }}</div>
+            {% endif %}
+            <div class="sidebar-user-info">
+                <h4>{{ user['name'] if user else 'User' }}</h4>
+                <span>AI Stylist</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('user.dashboard') }}" class="sidebar-link"><span>🏠</span> Dashboard</a>
+            <a href="{{ url_for('user.profile') }}" class="sidebar-link"><span>👤</span> My Profile</a>
+            <a href="{{ url_for('user.recommendations') }}" class="sidebar-link active"><span>✨</span> AI Stylist</a>
+            <a href="{{ url_for('user.products') }}" class="sidebar-link"><span>🛍️</span> Browse</a>
+            <a href="{{ url_for('user.logout') }}" class="sidebar-link sidebar-logout"><span>🚪</span> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="dashboard-main">
+        <div class="dashboard-header-bar">
+            <h1>✨ <span class="gradient-text">AI Fashion Stylist</span></h1>
+        </div>
+
+        <!-- Input Form -->
+        <div class="stylist-form-card">
+            <h3>Tell Us Your Occasion & Preferences</h3>
+            <form method="post" id="stylistForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Occasion</label>
+                        <select name="occasion" class="form-control" required>
+                            <option value="">Select Occasion</option>
+                            {% for occ in ['casual', 'formal', 'party', 'wedding', 'sports', 'office', 'beach'] %}
+                            <option value="{{ occ }}">{{ occ.title() }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Climate</label>
+                        <select name="climate" class="form-control" required>
+                            <option value="">Select Climate</option>
+                            {% for cli in ['hot', 'cold', 'moderate', 'rainy', 'humid'] %}
+                            <option value="{{ cli }}">{{ cli.title() }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Budget (₹)</label>
+                        <input type="number" name="budget" class="form-control" placeholder="e.g., 2000">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <span>🧠</span> Analyze & Recommend
+                </button>
+            </form>
+        </div>
+
+        {% if rec_data %}
+        <!-- Recommendation Results -->
+        <div class="rec-results">
+            <!-- Analysis Cards -->
+            <div class="rec-analysis-grid">
+                <div class="rec-card bmi-card">
+                    <h4>📊 Body Analysis</h4>
+                    {% if rec_data.bmi %}
+                    <div class="bmi-display">
+                        <span class="bmi-value">{{ rec_data.bmi }}</span>
+                        <span class="bmi-label">BMI</span>
+                    </div>
+                    <span class="bmi-category badge-{{ rec_data.bmi_category.lower() }}">{{ rec_data.bmi_category
+                        }}</span>
+                    {% endif %}
+                    <div class="rec-size-badge">Recommended Size: <strong>{{ rec_data.size }}</strong></div>
+                </div>
+
+                <div class="rec-card">
+                    <h4>👗 Body Type Styles</h4>
+                    <p class="rec-desc">{{ rec_data.get('body_type_description', '') }}</p>
+                    <div class="tag-list">
+                        {% for style in rec_data.body_type_tips[:5] %}
+                        <span class="style-tag">{{ style }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="rec-card">
+                    <h4>🎨 Your Color Palette</h4>
+                    <div class="color-palette">
+                        {% for color in rec_data.color_palette[:6] %}
+                        <div class="color-swatch" title="{{ color }}">
+                            <div class="swatch-dot" style="background: {{ color }};"></div>
+                            <span>{{ color }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="rec-card">
+                    <h4>🌤️ Climate & Occasion Tips</h4>
+                    <div class="tips-list">
+                        {% for tip in rec_data.climate_tips[:3] %}
+                        <span class="tip-chip">{{ tip }}</span>
+                        {% endfor %}
+                        {% for style in rec_data.occasion_styles[:3] %}
+                        <span class="tip-chip tip-occasion">{{ style }}</span>
+                        {% endfor %}
+                    </div>
+                    {% if rec_data.get('formality') %}
+                    <p class="formality-label">Formality Level: <strong>{{ rec_data.formality.title() }}</strong></p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Recommended Products -->
+            {% if products %}
+            <div class="rec-products-section">
+                <h2>🛍️ Recommended Products for You</h2>
+                <div class="products-grid">
+                    {% for product in products %}
+                    <div class="product-card">
+                        <div class="product-image-wrap">
+                            {% if product['image'] %}
+                            <img src="{{ url_for('static', filename='uploads/' + product['image']) }}"
+                                alt="{{ product['name'] }}" loading="lazy">
+                            {% else %}
+                            <div class="product-image-placeholder">👗</div>
+                            {% endif %}
+                            <div class="product-badges">
+                                <span class="badge-gender">{{ product['gender'].title() }}</span>
+                                {% if product['occasion'] %}
+                                <span class="badge-occasion">{{ product['occasion'].title() }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="product-info">
+                            <span class="product-brand">{{ product['brand_name'] }}</span>
+                            <h4 class="product-name">{{ product['name'] }}</h4>
+                            <p class="product-color">{{ product['color'] }} · {{ product['size'] }}</p>
+                            <div class="product-footer">
+                                <span class="product-price">₹{{ "%.0f"|format(product['price']) }}</span>
+                                <a href="{{ url_for('user.product_detail', product_id=product['id']) }}"
+                                    class="btn btn-primary btn-sm">
+                                    View & Try
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">🔍</div>
+                <h3>No matching products found</h3>
+                <p>Try adjusting your filters or browse all products.</p>
+                <a href="{{ url_for('user.products') }}" class="btn btn-primary">Browse All</a>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </main>
+</div>
+{% endblock %}

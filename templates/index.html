@@ -1,0 +1,258 @@
+﻿{% extends 'base.html' %}
+{% block title %}Home - Style Mate{% endblock %}
+{% block body_class %}home-page{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-bg">
+        <div class="hero-orb orb-1"></div>
+        <div class="hero-orb orb-2"></div>
+        <div class="hero-orb orb-3"></div>
+    </div>
+    <div class="hero-content">
+        <div class="hero-badge">
+            <span class="badge-dot"></span>
+            Powered by Style Mate AI
+        </div>
+        <h1 class="hero-title">
+            Dress Smarter with
+            <span class="gradient-text">AI-Powered</span>
+            Fashion Intelligence
+        </h1>
+        <p class="hero-subtitle">
+            Get personalized outfit recommendations based on your body type, skin tone, occasion, and climate.
+            Visualize how outfits look on you before purchasing — powered by Style Mate AI.
+        </p>
+        <div class="hero-cta">
+            <a href="{{ url_for('user.register') }}" class="btn btn-primary btn-lg">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                </svg>
+                Start Styling Free
+            </a>
+            <a href="{{ url_for('user.products') }}" class="btn btn-outline btn-lg">
+                Browse Collection
+            </a>
+        </div>
+        <div class="hero-stats">
+            <div class="stat">
+                <span class="stat-num">3</span>
+                <span class="stat-label">Modules</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat">
+                <span class="stat-num">AI</span>
+                <span class="stat-label">Visualization</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat">
+                <span class="stat-num">100%</span>
+                <span class="stat-label">Personalized</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Cards -->
+    <div class="hero-visual">
+        <div class="floating-card fc-1">
+            <div class="fc-icon">👗</div>
+            <div class="fc-text">Body Type Analysis</div>
+        </div>
+        <div class="floating-card fc-2">
+            <div class="fc-icon">🎨</div>
+            <div class="fc-text">Color Matching</div>
+        </div>
+        <div class="floating-card fc-3">
+            <div class="fc-icon">✨</div>
+            <div class="fc-text">AI Visualization</div>
+        </div>
+        <div class="hero-mockup">
+            <div class="mockup-screen">
+                <div class="mockup-header">
+                    <div class="mockup-dot"></div>
+                    <div class="mockup-dot"></div>
+                    <div class="mockup-dot"></div>
+                </div>
+                <div class="mockup-body">
+                    <div class="mockup-tag">AI Stylist</div>
+                    <div class="mockup-outfit-preview">
+                        <div class="outfit-shimmer"></div>
+                    </div>
+                    <div class="mockup-recs">
+                        <div class="rec-chip">Hourglass ✓</div>
+                        <div class="rec-chip">Navy Blue ✓</div>
+                        <div class="rec-chip">Formal ✓</div>
+                    </div>
+                    <div class="mockup-btn-fake">Generate Outfit →</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="section how-it-works">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">How It Works</span>
+            <h2 class="section-title">Your Style Journey in 4 Steps</h2>
+            <p class="section-subtitle">From profile creation to AI-visualized outfit — seamlessly personalized for you.
+            </p>
+        </div>
+
+        <div class="steps-grid">
+            <div class="step-card" data-step="1">
+                <div class="step-number">01</div>
+                <div class="step-icon">📋</div>
+                <h3>Complete Your Profile</h3>
+                <p>Enter your height, weight, body measurements, body type, and skin tone for precision recommendations.
+                </p>
+            </div>
+            <div class="step-card" data-step="2">
+                <div class="step-number">02</div>
+                <div class="step-icon">🧠</div>
+                <h3>AI Analyzes Your Style</h3>
+                <p>Our rule-based expert system analyzes your inputs against fashion principles to generate smart
+                    recommendations.</p>
+            </div>
+            <div class="step-card" data-step="3">
+                <div class="step-number">03</div>
+                <div class="step-icon">🛍️</div>
+                <h3>Browse Matched Products</h3>
+                <p>Discover curated outfits from verified vendors perfectly matched to your measurements and occasion.
+                </p>
+            </div>
+            <div class="step-card" data-step="4">
+                <div class="step-number">04</div>
+                <div class="step-icon">🪄</div>
+                <h3>Visualize with AI</h3>
+                <p>Use Style Mate AI to generate a realistic preview of how the outfit looks on your body type before
+                    buying.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="section features-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">Features</span>
+            <h2 class="section-title">Why Style Mate?</h2>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card featured">
+                <div class="feature-glow"></div>
+                <div class="feature-icon-wrap">
+                    <div class="feature-icon">🤖</div>
+                </div>
+                <h3>Style Mate AI Visualization</h3>
+                <p>See yourself in any outfit before buying. Our Style Mate AI generates photorealistic outfit previews
+                    personalized to your body characteristics.</p>
+                <span class="feature-tag">Powered by AI</span>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon-wrap">
+                    <div class="feature-icon">📐</div>
+                </div>
+                <h3>Body-Type Analysis</h3>
+                <p>Expert fashion rules tailored to hourglass, pear, apple, rectangle, and inverted triangle body types.
+                </p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon-wrap">
+                    <div class="feature-icon">🎨</div>
+                </div>
+                <h3>Skin Tone Matching</h3>
+                <p>Receive color recommendations perfectly calibrated to your skin tone for maximum visual impact.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon-wrap">
+                    <div class="feature-icon">🌍</div>
+                </div>
+                <h3>Climate-Smart Picks</h3>
+                <p>Outfit suggestions adapted to hot, cold, humid, rainy, or moderate weather conditions.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon-wrap">
+                    <div class="feature-icon">🎭</div>
+                </div>
+                <h3>Occasion Filtering</h3>
+                <p>Whether it's casual, formal, party, wedding, sports, or office — get outfits perfect for every
+                    occasion.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon-wrap">
+                    <div class="feature-icon">💰</div>
+                </div>
+                <h3>Budget-Aware</h3>
+                <p>All recommendations are filtered within your specified budget for stress-free shopping.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modules Section -->
+<section class="section modules-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">Platform Modules</span>
+            <h2 class="section-title">One Platform, Three Roles</h2>
+        </div>
+        <div class="modules-grid">
+            <div class="module-card module-user">
+                <div class="module-icon">👤</div>
+                <h3>User Module</h3>
+                <ul>
+                    <li>Personalized Recommendations</li>
+                    <li>AI Outfit Visualization</li>
+                    <li>Browse & Order Products</li>
+                    <li>Profile & Size Management</li>
+                </ul>
+                <a href="{{ url_for('user.register') }}" class="btn btn-primary">Get Started</a>
+            </div>
+            <div class="module-card module-vendor">
+                <div class="module-icon">🏪</div>
+                <h3>Vendor Module</h3>
+                <ul>
+                    <li>Product Catalog Management</li>
+                    <li>Upload Outfit Images</li>
+                    <li>Order & Sales Tracking</li>
+                    <li>Inventory Management</li>
+                </ul>
+                <a href="{{ url_for('vendor.register') }}" class="btn btn-secondary">Join as Vendor</a>
+            </div>
+            <div class="module-card module-admin">
+                <div class="module-icon">🛡️</div>
+                <h3>Admin Module</h3>
+                <ul>
+                    <li>Platform Oversight</li>
+                    <li>Vendor Approval System</li>
+                    <li>User Management</li>
+                    <li>Sales Analytics</li>
+                </ul>
+                <a href="{{ url_for('admin.login') }}" class="btn btn-outline">Admin Access</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="section cta-section">
+    <div class="container">
+        <div class="cta-card">
+            <div class="cta-glow"></div>
+            <h2>Ready to Dress Better with AI?</h2>
+            <p>Join Style Mate and discover outfits that truly match your unique style.</p>
+            <div class="cta-btns">
+                <a href="{{ url_for('user.register') }}" class="btn btn-primary btn-lg">Create Free Account</a>
+                <a href="{{ url_for('vendor.register') }}" class="btn btn-outline-light btn-lg">List Your Products</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

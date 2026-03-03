@@ -1,0 +1,53 @@
+﻿{% extends 'base.html' %}
+{% block title %}Place Order - Style Mate{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-card auth-card-wide">
+        <div class="auth-header">
+            <div class="auth-icon">🛍️</div>
+            <h1>Place Your Order</h1>
+        </div>
+
+        <div class="order-product-summary">
+            {% if product['image'] %}
+            <img src="{{ url_for('static', filename='uploads/' + product['image']) }}" class="order-product-img"
+                alt="{{ product['name'] }}">
+            {% endif %}
+            <div class="order-product-details">
+                <h3>{{ product['name'] }}</h3>
+                <p>₹{{ "%.2f"|format(product['price']) }} per item</p>
+            </div>
+        </div>
+
+        <form method="post" class="auth-form">
+            <div class="form-group">
+                <label>Quantity</label>
+                <input type="number" name="quantity" class="form-control" value="1" min="1" max="{{ product['stock'] }}"
+                    id="quantityInput" oninput="updateTotal()">
+            </div>
+            <div class="form-group">
+                <label>Delivery Address</label>
+                <textarea name="address" class="form-control" rows="3" required
+                    placeholder="Enter your full delivery address...">{% if user and user['email'] %}{% endif %}</textarea>
+            </div>
+            <div class="order-total-display">
+                Total: <strong id="totalDisplay">₹{{ "%.2f"|format(product['price']) }}</strong>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full btn-lg">Confirm Order</button>
+            <a href="{{ url_for('user.product_detail', product_id=product['id']) }}"
+                class="btn btn-outline btn-full">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const price = {{ product['price'] }};
+    function updateTotal() {
+        const qty = parseInt(document.getElementById('quantityInput').value) || 1;
+        document.getElementById('totalDisplay').textContent = '₹' + (price * qty).toFixed(2);
+    }
+</script>
+{% endblock %}

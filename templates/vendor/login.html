@@ -1,0 +1,34 @@
+﻿{% extends 'base.html' %}
+{% block title %}Vendor Login - Style Mate{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-icon vendor-auth-icon">🏪</div>
+            <h1>Vendor Portal</h1>
+            <p>Sign in to manage your store</p>
+        </div>
+        <form method="post" class="auth-form">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required placeholder="vendor@email.com"
+                    class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-with-toggle">
+                    <input type="password" id="password" name="password" required placeholder="••••••••"
+                        class="form-control">
+                    <button type="button" class="toggle-pass" onclick="togglePassword('password')">👁</button>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-secondary btn-full btn-lg">Sign In as Vendor</button>
+        </form>
+        <div class="auth-footer">
+            <p>New vendor? <a href="{{ url_for('vendor.register') }}">Register here</a></p>
+            <p style="font-size:0.85rem;opacity:0.7">Default: vendor@StyleMate.com / vendor123</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

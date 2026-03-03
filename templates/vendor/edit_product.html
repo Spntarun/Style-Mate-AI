@@ -1,0 +1,143 @@
+﻿{% extends 'base.html' %}
+{% block title %}Edit Product - Style Mate{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <aside class="dashboard-sidebar vendor-sidebar">
+        <div class="sidebar-profile">
+            <div class="sidebar-avatar-placeholder vendor-avatar">{{ session.get('vendor_name', 'V')[0] }}</div>
+            <div class="sidebar-user-info">
+                <h4>Vendor Portal</h4><span>Edit Product</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('vendor.dashboard') }}" class="sidebar-link"><span>🏠</span> Dashboard</a>
+            <a href="{{ url_for('vendor.products') }}" class="sidebar-link active"><span>👔</span> Products</a>
+            <a href="{{ url_for('vendor.add_product') }}" class="sidebar-link"><span>➕</span> Add Product</a>
+            <a href="{{ url_for('vendor.orders') }}" class="sidebar-link"><span>📦</span> Orders</a>
+            <a href="{{ url_for('vendor.sales') }}" class="sidebar-link"><span>📊</span> Sales</a>
+            <a href="{{ url_for('vendor.logout') }}" class="sidebar-link sidebar-logout"><span>🚪</span> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="dashboard-main">
+        <div class="dashboard-header-bar">
+            <h1>Edit <span class="gradient-text">Product</span></h1>
+        </div>
+
+        <div class="form-card-full">
+            <form method="post" enctype="multipart/form-data" class="product-form">
+                <div class="form-section">
+                    <h3>Basic Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Product Name *</label>
+                            <input type="text" name="name" required class="form-control" value="{{ product['name'] }}">
+                        </div>
+                        <div class="form-group">
+                            <label>Category *</label>
+                            <select name="category" required class="form-control">
+                                {% for cat in ['saree', 'kurti', 'lehenga', 'shirt', 'trousers', 'dress', 'jeans',
+                                't-shirt', 'ethnic', 'western', 'sportswear', 'blazer', 'skirt', 'jumpsuit', 'kurta',
+                                'sherwani'] %}
+                                <option value="{{ cat }}" {% if product['category']==cat %}selected{% endif %}>{{
+                                    cat.title() }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea name="description" class="form-control"
+                            rows="3">{{ product['description'] or '' }}</textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Pricing & Availability</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Price (₹) *</label>
+                            <input type="number" name="price" required class="form-control"
+                                value="{{ product['price'] }}" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label>Stock</label>
+                            <input type="number" name="stock" class="form-control" value="{{ product['stock'] }}"
+                                min="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Attributes</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Gender</label>
+                            <select name="gender" class="form-control">
+                                {% for g in ['female', 'male', 'unisex'] %}
+                                <option value="{{ g }}" {% if product['gender']==g %}selected{% endif %}>{{ g.title() }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Size</label>
+                            <select name="size" class="form-control">
+                                {% for s in ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Free Size'] %}
+                                <option value="{{ s }}" {% if product['size']==s %}selected{% endif %}>{{ s }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Color</label>
+                            <input type="text" name="color" class="form-control" value="{{ product['color'] or '' }}">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Occasion</label>
+                            <select name="occasion" class="form-control">
+                                {% for occ in ['casual', 'formal', 'party', 'wedding', 'sports', 'office', 'beach'] %}
+                                <option value="{{ occ }}" {% if product['occasion']==occ %}selected{% endif %}>{{
+                                    occ.title() }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Climate</label>
+                            <select name="climate" class="form-control">
+                                {% for cli in ['hot', 'cold', 'moderate', 'rainy', 'humid'] %}
+                                <option value="{{ cli }}" {% if product['climate']==cli %}selected{% endif %}>{{
+                                    cli.title() }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Product Image</h3>
+                    {% if product['image'] %}
+                    <div style="margin-bottom:1rem">
+                        <img src="{{ url_for('static', filename='uploads/' + product['image']) }}"
+                            style="max-height:150px; border-radius:8px;" alt="Current Image">
+                        <p class="form-hint">Upload a new image to replace the current one.</p>
+                    </div>
+                    {% endif %}
+                    <div class="photo-upload-zone">
+                        <div class="upload-icon">📷</div>
+                        <span>Upload New Image (Optional)</span>
+                        <input type="file" name="image" accept="image/*" class="file-input">
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-secondary btn-lg">Update Product</button>
+                    <a href="{{ url_for('vendor.products') }}" class="btn btn-outline btn-lg">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+{% endblock %}

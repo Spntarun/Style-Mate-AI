@@ -1,0 +1,247 @@
+﻿{% extends 'base.html' %}
+{% block title %}{{ product['name'] }} - Style Mate{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="product-detail-grid">
+            <!-- Left: Images -->
+            <div class="product-detail-images">
+                <div class="product-main-image" id="mainImgContainer" style="position:relative;overflow:hidden;">
+                    {% if product['image'] %}
+                    <!-- Blurred atmospheric backdrop -->
+                    <div id="imgBackdrop" style="position:absolute;inset:0;z-index:0;border-radius:inherit;
+                         background-size:cover;background-position:center;filter:blur(28px) saturate(1.6);
+                         opacity:0.35;transition:opacity 0.4s;pointer-events:none;"></div>
+                    <img src="{{ url_for('static', filename='uploads/' + product['image']) }}"
+                        alt="{{ product['name'] }}" id="mainProductImg"
+                        style="position:relative;z-index:1;cursor:zoom-in;transition:transform 0.35s;"
+                        onmouseover="this.style.transform='scale(1.025)'" onmouseout="this.style.transform='scale(1)'"
+                        onclick="openPreviewModal(this.src)" onload="applyBackdrop(this)">
+                    {% else %}
+                    <div class="product-image-placeholder large">👔</div>
+                    {% endif %}
+                </div>
+
+                <!-- AI Preview Section -->
+                <div class="ai-preview-section" id="aiPreviewSection" {% if not generated %}style="display:none;" {%
+                    endif %}>
+                    <div class="ai-preview-wrap">
+                        <div class="ai-preview-header">
+                            <span class="ai-badge">✨ AI VIRTUAL PREVIEW</span>
+                        </div>
+                        <img src="{% if generated %}{{ url_for('static', filename='generated/' + generated['generated_image']) }}{% endif %}"
+                            id="aiPreviewImg" onclick="openPreviewModal(this.src)" style="cursor:zoom-in;"
+                            title="Click to enlarge">
+                    </div>
+                    <p class="ai-note">Click image to enlarge · Powered by FASHN VTON 1.5</p>
+
+                    <!-- Action Buttons -->
+                    <div class="ai-preview-actions" id="aiPreviewActions"
+                        style="display:flex; gap:10px; margin-top:10px;">
+                        <button class="btn btn-outline btn-sm"
+                            onclick="openPreviewModal(document.getElementById('aiPreviewImg').src)">
+                            🔍 Fullscreen Preview
+                        </button>
+                        <button class="btn btn-outline btn-sm"
+                            onclick="downloadAIImage(document.getElementById('aiPreviewImg').src, '{{ product['name'] | replace(' ', '_') }}_try_on.png')">
+                            ⬇️ Download Image
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Info -->
+            <div class="product-detail-info">
+                <div class="product-detail-brand">{{ product['brand_name'] }}</div>
+                <h1 class="product-detail-name">{{ product['name'] }}</h1>
+
+                <div class="product-detail-meta">
+                    <span class="detail-chip">{{ product['category'].title() }}</span>
+                    <span class="detail-chip">{{ product['gender'].title() }}</span>
+                    {% if product['color'] %}<span class="detail-chip">{{ product['color'].title() }}</span>{% endif %}
+                    {% if product['occasion'] %}<span class="detail-chip">{{ product['occasion'].title() }}</span>{%
+                    endif %}
+                </div>
+
+                <div class="product-detail-price">
+                    <span class="price-label">Price:</span>
+                    <span class="price-value">₹{{ "%.0f"|format(product['price']) }}</span>
+                </div>
+
+                <div class="product-description">
+                    <h3>Description</h3>
+                    <p>{{ product['description'] or 'No description available for this premium piece.' }}</p>
+                </div>
+
+                <div class="product-fit-info">
+                    <h3>Compatibility</h3>
+                    <div class="fit-tags">
+                        <span class="fit-tag">Perfect for your {{ user['body_type'] or 'Body Type' }}</span>
+                        <span class="fit-tag">Complements {{ user['skin_tone'] or 'Skin Tone' }}</span>
+                    </div>
+                </div>
+
+                <div class="stock-info">
+                    {% if product['stock'] > 0 %}
+                    <span class="in-stock">✓ In Stock ({{ product['stock'] }} available)</span>
+                    {% else %}
+                    <span class="out-stock">✗ Out of Stock</span>
+                    {% endif %}
+                </div>
+
+                <div class="product-action-btns">
+                    <button class="btn btn-ai btn-full" id="visualizeBtn"
+                        onclick="generateAIPreview({{ product['id'] }})">
+                        <span>✨</span> Generate AI Virtual Preview
+                    </button>
+                    <a href="{{ url_for('user.place_order', product_id=product['id']) }}"
+                        class="btn btn-primary btn-full btn-lg">
+                        Buy Now
+                    </a>
+                </div>
+
+                <!-- AI Advice Box -->
+                <div class="ai-advice-box" id="aiAdviceBox" {% if not generated %}style="display:none;" {% endif %}>
+                    <div class="ai-advice-header">👨‍🏫 Stylist's Advice</div>
+                    <div class="ai-advice-content" id="aiAdviceContent">
+                        {% if generated %}{{ generated['advice'] if generated['advice'] else '' }}{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== FULLSCREEN PREVIEW MODAL ===== -->
+<div id="previewModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92);
+     z-index:9999; align-items:center; justify-content:center; flex-direction:column;">
+    <div style="position:relative; max-width:90vw; max-height:90vh;">
+        <img id="modalPreviewImg" src="" alt="AI Virtual Try-On Preview"
+            style="max-width:90vw; max-height:82vh; border-radius:16px; box-shadow:0 0 60px rgba(255,255,255,0.1); object-fit:contain;">
+        <div style="margin-top:16px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+            <button onclick="downloadAIImage(document.getElementById('modalPreviewImg').src, 'fashion_tryon.png')"
+                style="background:linear-gradient(135deg,#a855f7,#ec4899); color:#fff; border:none;
+                       padding:10px 24px; border-radius:30px; cursor:pointer; font-size:15px; font-weight:600;">
+                ⬇️ Download This Look
+            </button>
+            <button onclick="closePreviewModal()" style="background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.3);
+                       padding:10px 24px; border-radius:30px; cursor:pointer; font-size:15px;">
+                ✕ Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- AI Loading Overlay -->
+<div class="ai-loading-overlay" id="aiLoadingOverlay" style="display:none;">
+    <div class="ai-loading-card">
+        <div class="ai-spinner"></div>
+        <h3>Creating Your Virtual Try-On...</h3>
+        <p>FASHN AI is fitting the garment to your body profile. This may take up to 30 seconds.</p>
+        <div class="ai-progress">
+            <div class="ai-progress-bar" id="aiProgressBar"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ===== AMBIENT BACKDROP =====
+    function applyBackdrop(img) {
+        const backdrop = document.getElementById('imgBackdrop');
+        if (backdrop) {
+            backdrop.style.backgroundImage = `url('${img.src}')`;
+        }
+    }
+    // Apply immediately if already loaded
+    window.addEventListener('DOMContentLoaded', () => {
+        const img = document.getElementById('mainProductImg');
+        if (img && img.complete) applyBackdrop(img);
+    });
+
+    // ===== FULLSCREEN MODAL =====
+    function openPreviewModal(src) {
+        if (!src) return;
+        document.getElementById('modalPreviewImg').src = src;
+        const modal = document.getElementById('previewModal');
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+    function closePreviewModal() {
+        document.getElementById('previewModal').style.display = 'none';
+        document.body.style.overflow = '';
+    }
+    document.getElementById('previewModal').addEventListener('click', function (e) {
+        if (e.target === this) closePreviewModal();
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closePreviewModal();
+    });
+
+    // ===== DOWNLOAD =====
+    function downloadAIImage(src, filename) {
+        if (!src) return;
+        const a = document.createElement('a');
+        a.href = src;
+        a.download = filename || 'fashion_tryon.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+    // ===== GENERATE PREVIEW =====
+    function generateAIPreview(productId) {
+        const overlay = document.getElementById('aiLoadingOverlay');
+        const progressBar = document.getElementById('aiProgressBar');
+        const btn = document.getElementById('visualizeBtn');
+
+        overlay.style.display = 'flex';
+        btn.disabled = true;
+        progressBar.style.width = '0%';
+
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += Math.random() * 8;
+            if (progress > 92) progress = 92;
+            progressBar.style.width = progress + '%';
+        }, 800);
+
+        fetch(`/user/visualize/${productId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        })
+            .then(r => r.json())
+            .then(data => {
+                clearInterval(interval);
+                progressBar.style.width = '100%';
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                    btn.disabled = false;
+                    if (data.success) {
+                        const aiSection = document.getElementById('aiPreviewSection');
+                        const aiImg = document.getElementById('aiPreviewImg');
+                        const aiActions = document.getElementById('aiPreviewActions');
+                        const adviceBox = document.getElementById('aiAdviceBox');
+                        const adviceContent = document.getElementById('aiAdviceContent');
+
+                        aiImg.src = data.image_url;
+                        aiSection.style.display = 'block';
+                        aiActions.style.display = 'flex';
+                        adviceContent.innerHTML = data.advice.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+                        adviceBox.style.display = 'block';
+                        aiSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    } else {
+                        alert('AI Generation Error: ' + data.error);
+                    }
+                }, 400);
+            })
+            .catch(err => {
+                clearInterval(interval);
+                overlay.style.display = 'none';
+                btn.disabled = false;
+                alert('Server error. Please try again.');
+                console.error(err);
+            });
+    }
+</script>
+{% endblock %}

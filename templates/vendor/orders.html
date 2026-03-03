@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block title %}Orders - Vendor Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <aside class="dashboard-sidebar vendor-sidebar">
+        <div class="sidebar-profile">
+            <div class="sidebar-avatar-placeholder vendor-avatar">{{ session.get('vendor_name', 'V')[0] }}</div>
+            <div class="sidebar-user-info">
+                <h4>Vendor Portal</h4><span>Orders</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('vendor.dashboard') }}" class="sidebar-link"><span>🏠</span> Dashboard</a>
+            <a href="{{ url_for('vendor.products') }}" class="sidebar-link"><span>👔</span> Products</a>
+            <a href="{{ url_for('vendor.add_product') }}" class="sidebar-link"><span>➕</span> Add Product</a>
+            <a href="{{ url_for('vendor.orders') }}" class="sidebar-link active"><span>📦</span> Orders</a>
+            <a href="{{ url_for('vendor.sales') }}" class="sidebar-link"><span>📊</span> Sales</a>
+            <a href="{{ url_for('vendor.logout') }}" class="sidebar-link sidebar-logout"><span>🚪</span> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="dashboard-main">
+        <div class="dashboard-header-bar">
+            <h1><span class="gradient-text">Customer Orders</span></h1>
+        </div>
+
+        {% if orders %}
+        <div class="orders-table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Customer</th>
+                        <th>Product</th>
+                        <th>Qty</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Update</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for o in orders %}
+                    <tr>
+                        <td>#{{ o['id'] }}</td>
+                        <td>
+                            <strong>{{ o['user_name'] }}</strong>
+                            <br><small>{{ o['user_email'] }}</small>
+                        </td>
+                        <td>{{ o['product_name'] }}</td>
+                        <td>{{ o['quantity'] }}</td>
+                        <td>₹{{ "%.0f"|format(o['total_price']) }}</td>
+                        <td><span class="badge badge-{{ o['status'] }}">{{ o['status'].title() }}</span></td>
+                        <td>{{ o['created_at'][:10] }}</td>
+                        <td>
+                            <form method="post" action="{{ url_for('vendor.update_order', order_id=o['id']) }}"
+                                class="inline-form">
+                                <select name="status" class="form-control form-control-xs"
+                                    onchange="this.form.submit()">
+                                    {% for s in ['pending', 'processing', 'shipped', 'delivered', 'cancelled'] %}
+                                    <option value="{{ s }}" {% if o['status']==s %}selected{% endif %}>{{ s.title() }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">📋</div>
+            <h3>No orders yet</h3>
+        </div>
+        {% endif %}
+    </main>
+</div>
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block title %}Manage Products - Admin{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <aside class="dashboard-sidebar admin-sidebar">
+        <div class="sidebar-profile">
+            <div class="sidebar-avatar-placeholder admin-avatar">A</div>
+            <div class="sidebar-user-info">
+                <h4>Administrator</h4><span>Products</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('admin.dashboard') }}" class="sidebar-link"><span>🏠</span> Dashboard</a>
+            <a href="{{ url_for('admin.users') }}" class="sidebar-link"><span>👥</span> Users</a>
+            <a href="{{ url_for('admin.vendors') }}" class="sidebar-link"><span>🏪</span> Vendors</a>
+            <a href="{{ url_for('admin.products') }}" class="sidebar-link active"><span>👔</span> Products</a>
+            <a href="{{ url_for('admin.orders') }}" class="sidebar-link"><span>📦</span> Orders</a>
+            <a href="{{ url_for('admin.sales') }}" class="sidebar-link"><span>📊</span> Sales</a>
+            <a href="{{ url_for('admin.logout') }}" class="sidebar-link sidebar-logout"><span>🚪</span> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="dashboard-main">
+        <div class="dashboard-header-bar">
+            <h1>Manage <span class="gradient-text">Products</span></h1>
+        </div>
+
+        {% if products %}
+        <div class="orders-table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Product</th>
+                        <th>Brand</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Gender</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in products %}
+                    <tr>
+                        <td>
+                            {% if p['image'] %}
+                            <img src="{{ url_for('static', filename='uploads/' + p['image']) }}" class="table-thumb"
+                                alt="">
+                            {% else %}
+                            <span style="font-size:1.5rem">👗</span>
+                            {% endif %}
+                        </td>
+                        <td><strong>{{ p['name'] }}</strong></td>
+                        <td>{{ p['brand_name'] }}</td>
+                        <td>{{ p['category'].title() if p['category'] else '-' }}</td>
+                        <td>₹{{ "%.0f"|format(p['price']) }}</td>
+                        <td>{{ p['gender'].title() if p['gender'] else '-' }}</td>
+                        <td><span class="badge badge-{{ p['status'] }}">{{ p['status'].title() }}</span></td>
+                        <td>
+                            <form method="post" action="{{ url_for('admin.toggle_product', product_id=p['id']) }}">
+                                <button type="submit"
+                                    class="btn btn-xs {{ 'btn-warning' if p['status'] == 'active' else 'btn-success' }}">
+                                    {{ 'Deactivate' if p['status'] == 'active' else 'Activate' }}
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">👔</div>
+            <h3>No products yet</h3>
+        </div>
+        {% endif %}
+    </main>
+</div>
+{% endblock %}

@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block title %}Platform Sales - Admin{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <aside class="dashboard-sidebar admin-sidebar">
+        <div class="sidebar-profile">
+            <div class="sidebar-avatar-placeholder admin-avatar">A</div>
+            <div class="sidebar-user-info">
+                <h4>Administrator</h4><span>Sales</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('admin.dashboard') }}" class="sidebar-link"><span>🏠</span> Dashboard</a>
+            <a href="{{ url_for('admin.users') }}" class="sidebar-link"><span>👥</span> Users</a>
+            <a href="{{ url_for('admin.vendors') }}" class="sidebar-link"><span>🏪</span> Vendors</a>
+            <a href="{{ url_for('admin.products') }}" class="sidebar-link"><span>👔</span> Products</a>
+            <a href="{{ url_for('admin.orders') }}" class="sidebar-link"><span>📦</span> Orders</a>
+            <a href="{{ url_for('admin.sales') }}" class="sidebar-link active"><span>📊</span> Sales</a>
+            <a href="{{ url_for('admin.logout') }}" class="sidebar-link sidebar-logout"><span>🚪</span> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="dashboard-main">
+        <div class="dashboard-header-bar">
+            <h1>Platform <span class="gradient-text">Sales Analytics</span></h1>
+        </div>
+
+        <!-- Monthly Sales -->
+        <div class="dashboard-section">
+            <h2>Monthly Sales</h2>
+            {% if monthly_sales %}
+            <div class="orders-table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            <th>Orders</th>
+                            <th>Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for m in monthly_sales %}
+                        <tr>
+                            <td>{{ m['month'] }}</td>
+                            <td>{{ m['orders'] }}</td>
+                            <td>₹{{ "%.0f"|format(m['revenue']) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">📊</div>
+                <h3>No data yet</h3>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Top Vendors -->
+        <div class="dashboard-section">
+            <h2>Top Performing Vendors</h2>
+            {% if top_vendors %}
+            <div class="orders-table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Brand</th>
+                            <th>Orders</th>
+                            <th>Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for v in top_vendors %}
+                        <tr>
+                            <td><strong>{{ v['brand_name'] }}</strong></td>
+                            <td>{{ v['orders'] }}</td>
+                            <td>₹{{ "%.0f"|format(v['revenue']) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Category Performance -->
+        <div class="dashboard-section">
+            <h2>Category Performance</h2>
+            {% if category_sales %}
+            <div class="orders-table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Orders</th>
+                            <th>Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in category_sales %}
+                        <tr>
+                            <td>{{ c['category'].title() if c['category'] else 'Other' }}</td>
+                            <td>{{ c['orders'] }}</td>
+                            <td>₹{{ "%.0f"|format(c['revenue']) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+</div>
+{% endblock %}

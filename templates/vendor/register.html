@@ -1,0 +1,57 @@
+﻿{% extends 'base.html' %}
+{% block title %}Vendor Register - Style Mate{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-card auth-card-wide">
+        <div class="auth-header">
+            <div class="auth-icon vendor-auth-icon">🏪</div>
+            <h1>Become a Vendor</h1>
+            <p>Register your fashion brand on Style Mate</p>
+        </div>
+        <form method="post" class="auth-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Your Name</label>
+                    <input type="text" name="name" required placeholder="Full Name" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Brand Name</label>
+                    <input type="text" name="brand_name" required placeholder="Your Brand" class="form-control">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" required placeholder="vendor@email.com" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="tel" name="phone" placeholder="Phone Number" class="form-control">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Business Address</label>
+                <textarea name="address" class="form-control" rows="2" placeholder="Business address..."></textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" required placeholder="Min. 8 characters"
+                        class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" name="confirm_password" required placeholder="Repeat password"
+                        class="form-control">
+                </div>
+            </div>
+            <div class="info-note">ℹ️ Your account will be reviewed by admin before approval.</div>
+            <button type="submit" class="btn btn-secondary btn-full btn-lg">Submit Registration</button>
+        </form>
+        <div class="auth-footer">
+            <p>Already registered? <a href="{{ url_for('vendor.login') }}">Sign in</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
